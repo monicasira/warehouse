@@ -200,7 +200,6 @@ async function sendToBigQuery(reportName){
         skipLeadingRows: 1,
         location: 'asia-east2',
         schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
-        autodetect: true,
         writeDisposition: 'WRITE_APPEND',
         destinationTable: destinationTableRef
       };
