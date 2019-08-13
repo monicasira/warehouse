@@ -168,10 +168,10 @@ async function sendToBigQuery(reportName){
   	}
     
      const {BigQuery} = require('@google-cloud/bigquery');
-  	 const {Storage} = require('@google-cloud/storage');
+     const {Storage} = require('@google-cloud/storage');
 
-  	 const datasetId = 'ecomm_test';
-  	 const tableId = 'transactions';
+     const datasetId = 'ecomm_test';
+     const tableId = 'transactions';
 
 /**
  * This sample loads the CSV file at
@@ -179,37 +179,47 @@ async function sendToBigQuery(reportName){
  *
  * TODO(developer): Replace the following lines with the path to your file
  */
-	const bucketName = 'srichand-ecomm-staging';
-	const filename = reportName;
+      const bucketName = 'srichand-ecomm-staging';
+      const filename = reportName;
   // Imports a GCS file into a table with manually defined schema.
 
   // Instantiate clients
- 	 const bigqueryClient = new BigQuery();
-  	const storageClient = new Storage();
+      const bigqueryClient = new BigQuery();
+      const storageClient = new Storage();
+
+      const [table] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .get();
+      const destinationTableRef = table.metadata.tableReference;
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
-  const metadata = {
-    sourceFormat: 'CSV',
-    skipLeadingRows: 1,
-    location: 'US',
-  };
+      const metadata = {
+        sourceFormat: 'CSV',
+        skipLeadingRows: 1,
+        location: 'asia-east2',
+        schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+        autodetect: true,
+        writeDisposition: 'WRITE_APPEND',
+        destinationTable: destinationTableRef
+      };
 
-  // Load data from a Google Cloud Storage file into the table
-  const [job] = await bigqueryClient
-    .dataset(datasetId)
-    .table(tableId)
-    .load(storageClient.bucket(bucketName).file(filename), metadata);
+      // Load data from a Google Cloud Storage file into the table
+      const [job] = await bigqueryClient
+        .dataset(datasetId)
+        .table(tableId)
+        .load(storageClient.bucket(bucketName).file(filename), metadata);
 
-  // load() waits for the job to finish
-  console.log(`Job ${job.id} completed.`);
+      // load() waits for the job to finish
+      console.log(`Job ${job.id} completed.`);
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
-  }
-  
-  return reportName;
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+      
+      return reportName;
   
 }
