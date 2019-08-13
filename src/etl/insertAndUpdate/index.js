@@ -187,7 +187,7 @@ async function sendToBigQuery(reportName){
       const bigqueryClient = new BigQuery();
       const storageClient = new Storage();
 
-      const [table] = await bigquery
+      const [table] = await bigqueryClient
         .dataset(datasetId)
         .table(tableId)
         .get();
