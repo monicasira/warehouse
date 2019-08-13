@@ -72,7 +72,7 @@ function main() {
     const options2 = {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
-      location: 'asia-southeast1',
+      location: 'asia-east2',
     };
 
     // Run the query as a job
@@ -102,7 +102,7 @@ function main() {
       destinationTable: destinationTableRef3,
     };
 	
-	const [job3] = await bigquery.createQueryJob(options3);
+    const [job3] = await bigquery.createQueryJob(options3);
     console.log(`Job ${job3.id} started.`);
 
     // Wait for the query to finish
