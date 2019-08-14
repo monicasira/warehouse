@@ -87,17 +87,17 @@ async function listFilesByPrefix(bucketName) {
   // [END storage_list_files_with_prefix]
 }
 
-async function getOneFile(callback){
-  let rows = await getRows(dataset, migrationTable)
+async function getOneFile(datasetId, tableId, bucketName, callback){
+  let rows = await getRows(datasetId, tableId)
   console.log('rows in bigquery', rows);
-  let files = await listFilesByPrefix(bucket)
+  let files = await listFilesByPrefix(bucketName)
   console.log('files from Google Cloud Storage', files)
   let f = callback(rows, files);
   return f;
 }
 
-async function two(){
-  return await getOneFile(function(rows, files){  
+async function two(datasetId, tableId, bucketName){
+  return await getOneFile(datasetId, tableId, bucketName, function(rows, files){  
     const newFiles = []
   	console.log('in two');
   	files.forEach(file => {
@@ -116,7 +116,7 @@ async function six(){
   const table = 'transactions'
   const migrationTable = 'migration_files'
   const bucket = 'srichand-ecomm-staging'
-  let reportNames = await two()
+  let reportNames = await two(dataset, migrationTable, bucket)
   
    console.log('length', reportNames.length)
    console.log('each reportNames', reportNames)
