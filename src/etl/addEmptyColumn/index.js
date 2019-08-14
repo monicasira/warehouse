@@ -30,8 +30,10 @@ function main() {
       const bucket = storage.bucket(bucketName);
       const remoteFile = bucket.file(filename);
       var obj;
-      await remoteFile.createReadStream()
-        .on('error', function(err) {})
+      remoteFile.createReadStream()
+        .on('error', function(err) {
+          console.log('there is an error', err);
+         })
         .on('response', function(response) {
           console.log('response', response)
           // Server connected and responded with the specified status and headers.
