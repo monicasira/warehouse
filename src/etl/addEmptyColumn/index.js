@@ -19,7 +19,7 @@ function main() {
        */
       const datasetId = 'ecomm_test';
       const tableId = 'transactions';
-      const column = {name: 'size', type: 'STRING'};
+      const columns = [{name: 'size2', type: 'STRING'},{name: 'size', type: 'STRING'}];
 
       // Retrieve current table metadata
       const table = bigquery.dataset(datasetId).table(tableId);
@@ -28,7 +28,9 @@ function main() {
       // Update table schema
       const schema = metadata.schema;
       const new_schema = schema;
-      new_schema.fields.push(column);
+      for(let i = 0; i < columns.length; i++){
+        new_schema.fields.push(columns[i]);
+      }
       metadata.schema = new_schema;
 
       const [result] = await table.setMetadata(metadata);
