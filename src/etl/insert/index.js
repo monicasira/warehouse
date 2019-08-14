@@ -198,7 +198,6 @@ async function sendToBigQuery(reportName){
       const metadata = {
         sourceFormat: 'CSV',
         skipLeadingRows: 1,
-        autodetect: true,
         location: 'asia-east2',
         schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
         writeDisposition: 'WRITE_APPEND',
