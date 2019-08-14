@@ -30,7 +30,7 @@ function main() {
       const bucket = storage.bucket(bucketName);
       const remoteFile = bucket.file(filename);
       var obj;
-      remoteFile.createReadStream()
+      await remoteFile.createReadStream()
         .on('error', function(err) {})
         .on('response', function(response) {
           console.log('response', response)
@@ -42,7 +42,7 @@ function main() {
           obj = JSON.parse(data)
         })
 
-      console.log('json object', obj)
+      //console.log('json object', obj)
 
       // Retrieve current table metadata
       const table = bigquery.dataset(datasetId).table(tableId);
