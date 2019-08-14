@@ -25,7 +25,7 @@ exports.ecommInsertTest = (req, res) => {
 };
 
 
-async function getRows() {
+async function getRows(datasetId, tableId) {
   // [START bigquery_browse_table]
 
   // Import the Google Cloud client library and create a client
@@ -38,8 +38,8 @@ async function getRows() {
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-     const datasetId = "ecomm_test";
-     const tableId = "migration_files";
+     const datasetId = datasetId;
+     const tableId = tableId;
 
     // List rows in the table
     const [rows] = await bigquery
@@ -55,7 +55,7 @@ async function getRows() {
   //await browseRows();
 }
 
-async function listFilesByPrefix() {
+async function listFilesByPrefix(bucketName) {
   // [START storage_list_files_with_prefix]
   // Imports the Google Cloud client library
   
@@ -66,7 +66,7 @@ async function listFilesByPrefix() {
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  const bucketName = 'srichand-ecomm-staging';
+  const bucketName = bucketName;
   //const prefix = 'Prefix by which to filter, e.g. public/';
   const delimiter = '/';
 
@@ -88,9 +88,9 @@ async function listFilesByPrefix() {
 }
 
 async function getOneFile(callback){
-  let rows = await getRows()
+  let rows = await getRows('ecomm_test', 'migration_files')
   console.log('rows in bigquery', rows);
-  let files = await listFilesByPrefix()
+  let files = await listFilesByPrefix('srichand-ecomm-staging')
   console.log('files from Google Cloud Storage', files)
   let f = callback(rows, files);
   return f;
@@ -131,13 +131,13 @@ async function six(){
 // testing will use only 2 at a time
    for (let i = 0; i < 1; i++) {
      console.log('counter', i)
-     let m = await sendToBigQuery(reportNames[i])
-     let n = await migrationFileToBigQuery(reportNames[i])
+     let m = await sendToBigQuery(reportNames[i], 'ecomm_test', 'transactions', 'ecomm-srichand-staging')
+     let n = await migrationFileToBigQuery(reportNames[i], 'ecomm_test', 'migration_files')
    }
    
 }
 
-async function migrationFileToBigQuery(reportName){
+async function migrationFileToBigQuery(reportName, datasetId, tableId){
   	const {BigQuery} = require('@google-cloud/bigquery');
   	const bigquery = new BigQuery();
     
@@ -146,9 +146,9 @@ async function migrationFileToBigQuery(reportName){
       return;
     }
   async function insertRowsAsStream() {
-     const datasetId = 'ecomm_test';
-     const tableId = 'migration_files';
-   	 const rows = [{file: reportName}];
+     const datasetId = datasetId;
+     const tableId = tableId;
+     const rows = [{file: reportName}];
 
     // Insert data into a table
     await bigquery
@@ -161,7 +161,7 @@ async function migrationFileToBigQuery(reportName){
   await insertRowsAsStream();
 }
 
-async function sendToBigQuery(reportName){
+async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
     if (typeof reportName === 'undefined'){
       console.log('no report to save')
       return;
@@ -170,8 +170,8 @@ async function sendToBigQuery(reportName){
      const {BigQuery} = require('@google-cloud/bigquery');
      const {Storage} = require('@google-cloud/storage');
 
-     const datasetId = 'ecomm_test';
-     const tableId = 'transactions';
+     const datasetId = datasetId;
+     const tableId = tableId;
 
 /**
  * This sample loads the CSV file at
@@ -179,7 +179,7 @@ async function sendToBigQuery(reportName){
  *
  * TODO(developer): Replace the following lines with the path to your file
  */
-      const bucketName = 'srichand-ecomm-staging';
+      const bucketName = bucketName;
       const filename = reportName;
   // Imports a GCS file into a table with manually defined schema.
 
