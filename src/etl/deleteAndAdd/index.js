@@ -37,6 +37,7 @@ function main() {
       .table(tableId)
       .get();
     const destinationTableRef = table.metadata.tableReference;
+    console.log('table metadata', table.metadata)
     
     // Set load job options
     const options = {
