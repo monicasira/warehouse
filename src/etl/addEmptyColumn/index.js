@@ -19,7 +19,7 @@ function main() {
        */
       const datasetId = 'ecomm_test';
       const tableId = 'transactions';
-      const columns = [{name: 'size2', type: 'STRING'},{name: 'size', type: 'STRING'}];
+      const columns = [{name: 'size2', type: 'STRING'},{name: 'size3', type: 'STRING'}];
 
       // Retrieve current table metadata
       const table = bigquery.dataset(datasetId).table(tableId);
