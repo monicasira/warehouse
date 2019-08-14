@@ -38,8 +38,8 @@ async function getRows(datasetId, tableId) {
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-     const datasetId = datasetId;
-     const tableId = tableId;
+//     const datasetId = datasetId;
+//     const tableId = tableId;
 
     // List rows in the table
     const [rows] = await bigquery
@@ -66,7 +66,7 @@ async function listFilesByPrefix(bucketName) {
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  const bucketName = bucketName;
+  //const bucketName = bucketName;
   //const prefix = 'Prefix by which to filter, e.g. public/';
   const delimiter = '/';
 
@@ -88,9 +88,9 @@ async function listFilesByPrefix(bucketName) {
 }
 
 async function getOneFile(callback){
-  let rows = await getRows('ecomm_test', 'migration_files')
+  let rows = await getRows(dataset, migrationTable)
   console.log('rows in bigquery', rows);
-  let files = await listFilesByPrefix('srichand-ecomm-staging')
+  let files = await listFilesByPrefix(bucket)
   console.log('files from Google Cloud Storage', files)
   let f = callback(rows, files);
   return f;
@@ -112,6 +112,10 @@ async function two(){
 }
 
 async function six(){
+  const dataset = 'ecomm_test'
+  const table = 'transactions'
+  const migrationTable = 'migration_files'
+  const bucket = 'srichand-ecomm-staging'
   let reportNames = await two()
   
    console.log('length', reportNames.length)
@@ -131,8 +135,8 @@ async function six(){
 // testing will use only 2 at a time
    for (let i = 0; i < 1; i++) {
      console.log('counter', i)
-     let m = await sendToBigQuery(reportNames[i], 'ecomm_test', 'transactions', 'srichand-ecomm-staging')
-     let n = await migrationFileToBigQuery(reportNames[i], 'ecomm_test', 'migration_files')
+     let m = await sendToBigQuery(reportNames[i], dataset, table, bucket)
+     let n = await migrationFileToBigQuery(reportNames[i], dataset, migrationTable)
    }
    
 }
@@ -173,6 +177,12 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
 //     const datasetId = datasetId;
 //     const tableId = tableId;
 
+/**
+ * This sample loads the CSV file at
+ * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
+ *
+ * TODO(developer): Replace the following lines with the path to your file
+ */
       //const bucketName = bucketName;
       const filename = reportName;
   // Imports a GCS file into a table with manually defined schema.
