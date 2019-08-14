@@ -18,7 +18,6 @@ function main() {
   const {Storage} = require('@google-cloud/storage');
   const bucketName = 'srichand-ecomm-test';
   const filename = 'transactions2.csv'	;
-  //blissful-flame-245410.finding_nemo.checkout_products
   // Instantiate client
   const bigquery = new BigQuery();
   const storageClient = new Storage();
@@ -26,7 +25,7 @@ function main() {
   const tableId = 'transactions2';
   async function addColumnLoadAppend() {
     //** create new table
-	const [tableNew] = await bigquery
+    const [tableNew] = await bigquery
       .dataset(datasetId)
       .createTable(tableId);
     console.log(`New temp table created.`);
@@ -38,12 +37,19 @@ function main() {
       .get();
     const destinationTableRef = table.metadata.tableReference;
     
+    const tableId3 = 'transactions';
+    const [table3] = await bigquery
+      .dataset(datasetId)
+      .table(tableId3)
+      .get();
+    const destinationTableRef3 = table3.metadata.tableReference;
+
     // Set load job options
     const options = {
-      //schema: schema,
+      schema: table3.metadata.schema,
       schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
       skipLeadingRows: 1,
-      autodetect: true,
+      //autodetect: true,
       writeDisposition: 'WRITE_APPEND',
       createDisposition: 'CREATE_IF_NEEDED',
       destinationTable: destinationTableRef,
@@ -86,14 +92,6 @@ function main() {
 	//** append new table to original table
     const query3 = `Select * from \`data-warehouse-srichand.ecomm_test.transactions2\``;
 
-    const tableId3 = 'transactions';
-    const [table3] = await bigquery
-      .dataset(datasetId)
-      .table(tableId3)
-      .get();
-    const destinationTableRef3 = table3.metadata.tableReference;
-
-    console.log('table metadata', table3.metadata)
     // Set load job options
     const options3 = {
       query: query3,
