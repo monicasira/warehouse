@@ -9,6 +9,7 @@ exports.ecommAddEmptyColumn = (req, res) => {
 function main() {
 
     const {BigQuery} = require('@google-cloud/bigquery');
+    const {Storage} = require('@google-cloud/storage');
     const bigquery = new BigQuery();
     const fs = require('fs');
 
