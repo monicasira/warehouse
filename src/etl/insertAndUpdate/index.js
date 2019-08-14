@@ -129,7 +129,7 @@ async function six(){
 //   }
 
 // testing will use only 2 at a time
-   for (let i = 1; i < 3; i++) {
+   for (let i = 0; i < 1; i++) {
      console.log('counter', i)
      let m = await sendToBigQuery(reportNames[i])
      let n = await migrationFileToBigQuery(reportNames[i])

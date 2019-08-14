@@ -43,7 +43,7 @@ function main() {
       //schema: schema,
       schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
       skipLeadingRows: 1,
-      autodetect: true,
+      //autodetect: true,
       writeDisposition: 'WRITE_APPEND',
       createDisposition: 'CREATE_IF_NEEDED',
       destinationTable: destinationTableRef,
