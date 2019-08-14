@@ -37,7 +37,6 @@ function main() {
       .table(tableId)
       .get();
     const destinationTableRef = table.metadata.tableReference;
-    console.log('table metadata', table.metadata)
     
     // Set load job options
     const options = {
@@ -94,6 +93,7 @@ function main() {
       .get();
     const destinationTableRef3 = table3.metadata.tableReference;
 
+    console.log('table metadata', table3.metadata)
     // Set load job options
     const options3 = {
       query: query3,
