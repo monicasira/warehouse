@@ -33,12 +33,14 @@ function main() {
       remoteFile.createReadStream()
         .on('error', function(err) {})
         .on('response', function(response) {
+          console.log('response', response)
           // Server connected and responded with the specified status and headers.
          })
-        .on('end', function() {
+        .on('end', function(data) {
           // The file is fully downloaded.
+          console.log('end', data);
+          obj = JSON.parse(data)
         })
-        .pipe(obj);
 
       console.log('json object', obj)
 
