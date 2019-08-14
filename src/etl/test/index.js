@@ -17,13 +17,13 @@ function main() {
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
   const bucketName = 'srichand-ecomm-test';
-  const filename = 'checkout_products4.csv'	;
+  const filename = 'transactions2.csv'	;
   //blissful-flame-245410.finding_nemo.checkout_products
   // Instantiate client
   const bigquery = new BigQuery();
   const storageClient = new Storage();
   const datasetId = 'ecomm_test';
-  const tableId = 'checkout_products4';
+  const tableId = 'transactions2';
   async function addColumnLoadAppend() {
     //** create new table
 	const [tableNew] = await bigquery
@@ -43,7 +43,7 @@ function main() {
       //schema: schema,
       schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
       skipLeadingRows: 1,
-      //autodetect: true,
+      autodetect: true,
       writeDisposition: 'WRITE_APPEND',
       createDisposition: 'CREATE_IF_NEEDED',
       destinationTable: destinationTableRef,
@@ -65,8 +65,8 @@ function main() {
     }
 
     //** Delete matching line_items from original table
-    const query = `DELETE \`data-warehouse-srichand.ecomm_test.checkout_products2\` i
-		WHERE i.id IN (SELECT id from \`data-warehouse-srichand.ecomm_test.checkout_products4\`)`;
+    const query = `DELETE \`data-warehouse-srichand.ecomm_test.transactions\` i
+		WHERE i.line_item_id IN (SELECT line_item_id from \`data-warehouse-srichand.ecomm_test.transactions2\`)`;
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options2 = {
@@ -84,9 +84,9 @@ function main() {
     console.log(`Job ${job2.id} deleted matching from original completed.`);
 
 	//** append new table to original table
-    const query3 = `Select * from \`data-warehouse-srichand.ecomm_test.checkout_products4\``;
+    const query3 = `Select * from \`data-warehouse-srichand.ecomm_test.transactions2\``;
 
-    const tableId3 = 'checkout_products2';
+    const tableId3 = 'transactions';
     const [table3] = await bigquery
       .dataset(datasetId)
       .table(tableId3)
