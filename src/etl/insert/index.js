@@ -131,7 +131,7 @@ async function six(){
 // testing will use only 2 at a time
    for (let i = 0; i < 1; i++) {
      console.log('counter', i)
-     let m = await sendToBigQuery(reportNames[i], 'ecomm_test', 'transactions', 'ecomm-srichand-staging')
+     let m = await sendToBigQuery(reportNames[i], 'ecomm_test', 'transactions', 'srichand-ecomm-staging')
      let n = await migrationFileToBigQuery(reportNames[i], 'ecomm_test', 'migration_files')
    }
    
@@ -146,8 +146,8 @@ async function migrationFileToBigQuery(reportName, datasetId, tableId){
       return;
     }
   async function insertRowsAsStream() {
-     const datasetId = datasetId;
-     const tableId = tableId;
+//     const datasetId = datasetId;
+//     const tableId = tableId;
      const rows = [{file: reportName}];
 
     // Insert data into a table
@@ -170,16 +170,10 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
      const {BigQuery} = require('@google-cloud/bigquery');
      const {Storage} = require('@google-cloud/storage');
 
-     const datasetId = datasetId;
-     const tableId = tableId;
+//     const datasetId = datasetId;
+//     const tableId = tableId;
 
-/**
- * This sample loads the CSV file at
- * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
- *
- * TODO(developer): Replace the following lines with the path to your file
- */
-      const bucketName = bucketName;
+      //const bucketName = bucketName;
       const filename = reportName;
   // Imports a GCS file into a table with manually defined schema.
 
