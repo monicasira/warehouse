@@ -1,0 +1,8 @@
+{
+  "name": "sample-http",
+  "version": "0.0.1",
+  "dependencies": {
+    "@google-cloud/bigquery": "^4.1.4",
+    "@google-cloud/storage": "^3.0.0"
+  }
+}
