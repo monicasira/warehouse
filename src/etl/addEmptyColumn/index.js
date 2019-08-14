@@ -23,17 +23,23 @@ function main() {
       const tableId = 'transactions';
       const columns = [{name: 'size2', type: 'STRING'},{name: 'size3', type: 'STRING'}];
 
-      //storage
+      //save file in memory
       const bucketName = 'srichand-ecomm-test';
       const filename = 'schema-files/schema1.json';
       const storage = new Storage();
       const bucket = storage.bucket(bucketName);
       const remoteFile = bucket.file(filename);
       var obj;
-      fs.readFile(remoteFile, 'utf8', function (err, data) {
-        if (err) throw err;
-        obj = JSON.parse(data);
-      });
+      remoteFile.createReadStream()
+        .on('error', function(err) {})
+        .on('response', function(response) {
+          // Server connected and responded with the specified status and headers.
+         })
+        .on('end', function() {
+          // The file is fully downloaded.
+        })
+        .pipe(obj);
+
       console.log('json object', obj)
 
       // Retrieve current table metadata
