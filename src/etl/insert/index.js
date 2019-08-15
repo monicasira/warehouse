@@ -26,48 +26,24 @@ exports.ecommInsertTest = (req, res) => {
 
 
 async function getRows(datasetId, tableId) {
-  // [START bigquery_browse_table]
-
-  // Import the Google Cloud client library and create a client
   
   const bigquery = new BigQuery();
 
-  //async function browseRows() {
-    // Displays rows from "my_table" in "my_dataset".
-
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-//     const datasetId = datasetId;
-//     const tableId = tableId;
-
-    // List rows in the table
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
-	const rows_name_list = []
-    console.log('Rows:');
-    rows.forEach(row => rows_name_list.push(row['file']));
-    return rows_name_list
-  //}
-  // [END bigquery_browse_table]
-  //await browseRows();
+  // List rows in the table
+  const [rows] = await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .getRows();
+      const rows_name_list = []
+  console.log('Rows:');
+  rows.forEach(row => rows_name_list.push(row['file']));
+  return rows_name_list
 }
 
 async function listFilesByPrefix(bucketName) {
-  // [START storage_list_files_with_prefix]
-  // Imports the Google Cloud client library
-  
-
   // Creates a client
   const storage = new Storage();
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  //const bucketName = bucketName;
-  //const prefix = 'Prefix by which to filter, e.g. public/';
   const delimiter = '/';
 
   const options = {
@@ -80,11 +56,9 @@ async function listFilesByPrefix(bucketName) {
 
   // Lists files in the bucket, filtered by a prefix
   const [files] = await storage.bucket(bucketName).getFiles(options);
-  //const [files] = await storage.bucket(bucketName).getFiles();
   
   console.log('Files:', files);
   return files
-  // [END storage_list_files_with_prefix]
 }
 
 async function compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, callback){
@@ -92,18 +66,17 @@ async function compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketNam
   console.log('rows in bigquery', rows);
   let files = await listFilesByPrefix(bucketName)
   console.log('files from Google Cloud Storage', files)
-  let f = callback(rows, files);
-  return f;
+  let fileDiff = callback(rows, files);
+  return fileDiff;
 }
 
 async function getFileDiff(datasetId, tableId, bucketName){
   return await compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, function(rows, files){  
     const newFiles = []
-  	files.forEach(file => {
-   	 newFiles.push(file.name);
-  	});
+    files.forEach(file => {
+     newFiles.push(file.name);
+    });
     
-    console.log('new files in two', newFiles)
     let diff = newFiles.filter(file => !rows.includes(file))
     console.log('diff', diff)
     return diff
@@ -115,15 +88,16 @@ async function insertCSV(){
   const table = 'transactions'
   const migrationTable = 'migration_files'
   const bucket = 'srichand-ecomm-staging'
+
   let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
-   console.log('length', fileList.length)
-   console.log('each fileList', fileList)
+  console.log('length', fileList.length)
+  console.log('each fileList', fileList)
  
-   if (fileList.length === 0){
-     console.log('no reports to save');
-     return;
-   }
+  if (fileList.length === 0){
+    console.log('no reports to save');
+    return;
+  }
    //For production will use all diffs
 //   for (let i = 0; i < fileList.length; i++) {
 //     console.log('counter', i)
@@ -132,11 +106,11 @@ async function insertCSV(){
 //   }
 
 // testing will use only 2 at a time
-   for (let i = 0; i < 2; i++) {
-     console.log('counter', i)
-     await sendToBigQuery(fileList[i], dataset, table, bucket);
-     await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
-   }
+  for (let i = 0; i < 2; i++) {
+    console.log('counter', i)
+    await sendToBigQuery(fileList[i], dataset, table, bucket);
+    await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
+  }
    
 }
 
@@ -153,13 +127,13 @@ async function updateCSV(){
   const bucket = 'srichand-ecomm-test'
   let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
-   console.log('length', fileList.length)
-   console.log('each fileList', fileList)
+  console.log('length', fileList.length)
+  console.log('each fileList', fileList)
  
-   if (fileList.length === 0){
-     console.log('no reports to save');
-     return;
-   }
+  if (fileList.length === 0){
+    console.log('no reports to save');
+    return;
+  }
    //For production will use all diffs
 //   for (let i = 0; i < fileList.length; i++) {
 //     console.log('counter', i)
@@ -168,201 +142,194 @@ async function updateCSV(){
 //   }
 
 // testing will use only 2 at a time
-   for (let i = 0; i < 3; i++) {
-     console.log('counter', i)
-     let csvFile = fileList[i];
-     let tempTableName = 'temp_table';
-     // deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-     await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
-     await migrationFileToBigQuery(csvFile, dataset, migrationTable);
-   }
-   
+  for (let i = 0; i < 3; i++) {
+    console.log('counter', i)
+    let csvFile = fileList[i];
+    let tempTableName = 'temp_table';
+    // deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
+    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
+    await migrationFileToBigQuery(csvFile, dataset, migrationTable);
+  }
 }
+
 async function insertAndUpdateCsv(){
   await insertCSV();
   await updateCSV();
 }
 
 async function migrationFileToBigQuery(reportName, datasetId, tableId){
-  	const {BigQuery} = require('@google-cloud/bigquery');
-  	const bigquery = new BigQuery();
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
     
-    if (typeof reportName === 'undefined'){
-      console.log('no report to send to big query')
-      return;
-    }
+  if (typeof reportName === 'undefined'){
+    console.log('no report to send to big query')
+    return;
+  }
   async function insertRowsAsStream() {
-//     const datasetId = datasetId;
-//     const tableId = tableId;
-     const rows = [{file: reportName}];
+  const rows = [{file: reportName}];
 
     // Insert data into a table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .insert(rows);
-    console.log(`Inserted ${rows.length} row for migration file.`);
+  await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .insert(rows);
+
+  console.log(`Inserted ${rows.length} row for migration file.`);
+
   }
-  // [END bigquery_table_insert_rows]
   await insertRowsAsStream();
 }
 
 async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
-    if (typeof reportName === 'undefined'){
-      console.log('no report to save')
-      return;
-  	}
-    
-     const {BigQuery} = require('@google-cloud/bigquery');
-     const {Storage} = require('@google-cloud/storage');
+  if (typeof reportName === 'undefined'){
+    console.log('no report to save')
+    return;
+  }
 
-//     const datasetId = datasetId;
-//     const tableId = tableId;
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const {Storage} = require('@google-cloud/storage');
 
-/**
- * This sample loads the CSV file at
- * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
- *
- * TODO(developer): Replace the following lines with the path to your file
- */
-      //const bucketName = bucketName;
-      const filename = reportName;
+  const filename = reportName;
   // Imports a GCS file into a table with manually defined schema.
 
   // Instantiate clients
-      const bigqueryClient = new BigQuery();
-      const storageClient = new Storage();
+  const bigqueryClient = new BigQuery();
+  const storageClient = new Storage();
 
-      const [table] = await bigqueryClient
-        .dataset(datasetId)
-        .table(tableId)
-        .get();
-      const destinationTableRef = table.metadata.tableReference;
+  const [table] = await bigqueryClient
+    .dataset(datasetId)
+    .table(tableId)
+    .get();
+
+  const destinationTableRef = table.metadata.tableReference;
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
-      const metadata = {
-        sourceFormat: 'CSV',
-        skipLeadingRows: 1,
-        location: 'asia-east2',
-        schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
-        writeDisposition: 'WRITE_APPEND',
-        destinationTable: destinationTableRef
-      };
+  const metadata = {
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    location: 'asia-east2',
+    schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+    writeDisposition: 'WRITE_APPEND',
+    destinationTable: destinationTableRef
+  };
 
-      // Load data from a Google Cloud Storage file into the table
-      const [job] = await bigqueryClient
-        .dataset(datasetId)
-        .table(tableId)
-        .load(storageClient.bucket(bucketName).file(filename), metadata);
+  // Load data from a Google Cloud Storage file into the table
+  const [job] = await bigqueryClient
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storageClient.bucket(bucketName).file(filename), metadata);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-      
-      return reportName;
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
+
+  return reportName;
   
 }
 
-  async function deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName, bucketName) {
-    const {BigQuery} = require('@google-cloud/bigquery');
-    const {Storage} = require('@google-cloud/storage');
-    const bigquery = new BigQuery();
-    const storageClient = new Storage();
+async function deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName, bucketName) {
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const {Storage} = require('@google-cloud/storage');
+  const bigquery = new BigQuery();
+  const storageClient = new Storage();
 
-    //** create new table
-    const [tableNew] = await bigquery
-      .dataset(datasetId)
-      .createTable(tempTableId);
-    console.log(`New temp table created.`);
+  //** create new table
+  const [tableNew] = await bigquery
+    .dataset(datasetId)
+    .createTable(tempTableId);
 
-    // Retrieve destination table reference
-    const [tempTable] = await bigquery
-      .dataset(datasetId)
-      .table(tempTableId)
-      .get();
-    const destinationTableRefTemp = tempTable.metadata.tableReference;
-    
-    const [transactionsTable] = await bigquery
-      .dataset(datasetId)
-      .table(transactionsTableId)
-      .get();
-    const destinationTableRefTransactions = transactionsTable.metadata.tableReference;
+  console.log(`New temp table created.`);
 
-    // Set load job options
-    const options = {
-      schema: transactionsTable.metadata.schema,
-      schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
-      skipLeadingRows: 1,
-      writeDisposition: 'WRITE_APPEND',
-      createDisposition: 'CREATE_IF_NEEDED',
-      destinationTable: destinationTableRefTemp,
-    };
-	
-    // Load data from a google cloud storage into the table
-    const [jobLoad] = await bigquery
-      .dataset(datasetId)
-      .table(tempTableId)
-      .load(storageClient.bucket(bucketName).file(fileName), options);
-      //.load(fileName, options);
+  // Retrieve destination table reference
+  const [tempTable] = await bigquery
+    .dataset(datasetId)
+    .table(tempTableId)
+    .get();
 
-    console.log(`Job ${jobLoad.id} load csv to table completed.`);
+  const destinationTableRefTemp = tempTable.metadata.tableReference;
+  
+  const [transactionsTable] = await bigquery
+    .dataset(datasetId)
+    .table(transactionsTableId)
+    .get();
 
-    // Check the job's status for errors
-    const errors = jobLoad.status.errors;
-    if (errors && errors.length > 0) {
-      throw errors;
-    }
+  const destinationTableRefTransactions = transactionsTable.metadata.tableReference;
 
-    //** Delete matching line_items from original table
-    const queryDelete = `DELETE \`${project}.${datasetId}.${transactionsTableId}\` i
-		WHERE i.line_item_id IN (SELECT line_item_id from \`${project}.${datasetId}.${tempTableId}\`)`;
+  // Set load job options
+  const options = {
+    schema: transactionsTable.metadata.schema,
+    schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+    skipLeadingRows: 1,
+    writeDisposition: 'WRITE_APPEND',
+    createDisposition: 'CREATE_IF_NEEDED',
+    destinationTable: destinationTableRefTemp,
+  };
+      
+  // Load data from a google cloud storage into the table
+  const [jobLoad] = await bigquery
+    .dataset(datasetId)
+    .table(tempTableId)
+    .load(storageClient.bucket(bucketName).file(fileName), options);
+    //.load(fileName, options);
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
-    const optionsDelete = {
-      query: queryDelete,
-      // Location must match that of the dataset(s) referenced in the query.
-      location: 'asia-east2',
-    };
+  console.log(`Job ${jobLoad.id} load csv to table completed.`);
 
-    // Run the query as a job
-    const [jobDelete] = await bigquery.createQueryJob(optionsDelete);
-    console.log(`Job ${jobDelete.id} started.`);
-
-    // Wait for the query to finish
-    const [rows] = await jobDelete.getQueryResults();
-    console.log(`Job ${jobDelete.id} deleted matching from original completed.`);
-
-	//** append new table to original table
-    const queryAppend = `Select * from \`${project}.${datasetId}.${tempTableId}\``;
-
-    // Set load job options
-    const optionsAppend = {
-      query: queryAppend,
-      schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
-      skipLeadingRows: 1,
-      writeDisposition: 'WRITE_APPEND',
-      destinationTable: destinationTableRefTransactions,
-    };
-	
-    const [jobAppend] = await bigquery.createQueryJob(optionsAppend);
-    console.log(`Job ${jobAppend.id} started.`);
-
-    // Wait for the query to finish
-    const [rows3] = await jobAppend.getQueryResults();
-    console.log(`Job ${jobAppend.id} adding rows to original completed.`);
-	
-    //** Delete table
-    await bigquery
-      .dataset(datasetId)
-      .table(tempTableId)
-      .delete();
-
-    console.log(`Table ${tempTableId} deleted.`);
-
+  // Check the job's status for errors
+  const errors = jobLoad.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
   }
+
+  //** Delete matching line_items from original table
+  const queryDelete = `DELETE \`${project}.${datasetId}.${transactionsTableId}\` i
+              WHERE i.line_item_id IN (SELECT line_item_id from \`${project}.${datasetId}.${tempTableId}\`)`;
+
+  // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
+  const optionsDelete = {
+    query: queryDelete,
+    // Location must match that of the dataset(s) referenced in the query.
+    location: 'asia-east2',
+  };
+
+  // Run the query as a job
+  const [jobDelete] = await bigquery.createQueryJob(optionsDelete);
+  console.log(`Job ${jobDelete.id} started.`);
+
+  // Wait for the query to finish
+  const [rows] = await jobDelete.getQueryResults();
+  console.log(`Job ${jobDelete.id} deleted matching from original completed.`);
+
+      //** append new table to original table
+  const queryAppend = `Select * from \`${project}.${datasetId}.${tempTableId}\``;
+
+  // Set load job options
+  const optionsAppend = {
+    query: queryAppend,
+    schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+    skipLeadingRows: 1,
+    writeDisposition: 'WRITE_APPEND',
+    destinationTable: destinationTableRefTransactions,
+  };
+      
+  const [jobAppend] = await bigquery.createQueryJob(optionsAppend);
+  console.log(`Job ${jobAppend.id} started.`);
+
+  // Wait for the query to finish
+  const [rows3] = await jobAppend.getQueryResults();
+  console.log(`Job ${jobAppend.id} adding rows to original completed.`);
+      
+  //** Delete table
+  await bigquery
+    .dataset(datasetId)
+    .table(tempTableId)
+    .delete();
+
+  console.log(`Table ${tempTableId} deleted.`);
+
+}
