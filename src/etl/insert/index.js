@@ -310,7 +310,7 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
     const [jobLoad] = await bigquery
       .dataset(datasetId)
       .table(tempTableId)
-      .load(storageClient.bucket(bucketName).file(filename), options);
+      .load(storageClient.bucket(bucketName).file(fileName), options);
       //.load(fileName, options);
 
     console.log(`Job ${jobLoad.id} load csv to table completed.`);
