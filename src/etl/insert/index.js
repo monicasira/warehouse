@@ -21,8 +21,7 @@ exports.helloPubSub = (event, context) => {
 exports.ecommInsertTest = (req, res) => {
   let message = req.query.message || req.body.message || 'Hello World!';
   res.status(200).send(message);
-  //insertAndUpdateCsv();
-  updateCSV();
+  insertAndUpdateCsv();
 };
 
 
@@ -88,7 +87,7 @@ async function listFilesByPrefix(bucketName) {
   // [END storage_list_files_with_prefix]
 }
 
-async function getOneFile(datasetId, tableId, bucketName, callback){
+async function compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, callback){
   let rows = await getRows(datasetId, tableId)
   console.log('rows in bigquery', rows);
   let files = await listFilesByPrefix(bucketName)
@@ -97,10 +96,9 @@ async function getOneFile(datasetId, tableId, bucketName, callback){
   return f;
 }
 
-async function two(datasetId, tableId, bucketName){
-  return await getOneFile(datasetId, tableId, bucketName, function(rows, files){  
+async function getFileDiff(datasetId, tableId, bucketName){
+  return await compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, function(rows, files){  
     const newFiles = []
-  	console.log('in two');
   	files.forEach(file => {
    	 newFiles.push(file.name);
   	});
@@ -117,27 +115,27 @@ async function insertCSV(){
   const table = 'transactions'
   const migrationTable = 'migration_files'
   const bucket = 'srichand-ecomm-staging'
-  let reportNames = await two(dataset, migrationTable, bucket)
+  let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
-   console.log('length', reportNames.length)
-   console.log('each reportNames', reportNames)
+   console.log('length', fileList.length)
+   console.log('each fileList', fileList)
  
-   if (reportNames.length === 0){
+   if (fileList.length === 0){
      console.log('no reports to save');
      return;
    }
    //For production will use all diffs
-//   for (let i = 0; i < reportNames.length; i++) {
+//   for (let i = 0; i < fileList.length; i++) {
 //     console.log('counter', i)
-//     let m = await sendToBigQuery(reportNames[i])
-//     let n = migrationFileToBigQuery(reportNames[i])
+//     let m = await sendToBigQuery(fileList[i])
+//     let n = migrationFileToBigQuery(fileList[i])
 //   }
 
 // testing will use only 2 at a time
    for (let i = 0; i < 2; i++) {
      console.log('counter', i)
-     let m = await sendToBigQuery(reportNames[i], dataset, table, bucket)
-     let n = await migrationFileToBigQuery(reportNames[i], dataset, migrationTable)
+     await sendToBigQuery(fileList[i], dataset, table, bucket);
+     await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
    }
    
 }
@@ -153,30 +151,30 @@ async function updateCSV(){
   const transactionsTableName = 'transactions'
   const migrationTable = 'update_migration_files'
   const bucket = 'srichand-ecomm-test'
-  let reportNames = await two(dataset, migrationTable, bucket)
+  let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
-   console.log('length', reportNames.length)
-   console.log('each reportNames', reportNames)
+   console.log('length', fileList.length)
+   console.log('each fileList', fileList)
  
-   if (reportNames.length === 0){
+   if (fileList.length === 0){
      console.log('no reports to save');
      return;
    }
    //For production will use all diffs
-//   for (let i = 0; i < reportNames.length; i++) {
+//   for (let i = 0; i < fileList.length; i++) {
 //     console.log('counter', i)
-//     let m = await sendToBigQuery(reportNames[i])
-//     let n = migrationFileToBigQuery(reportNames[i])
+//     let m = await sendToBigQuery(fileList[i])
+//     let n = migrationFileToBigQuery(fileList[i])
 //   }
 
 // testing will use only 2 at a time
    for (let i = 0; i < 3; i++) {
      console.log('counter', i)
-     let csvFile = reportNames[i];
+     let csvFile = fileList[i];
      let tempTableName = 'temp_table';
      // deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-     let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
-     let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
+     await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
+     await migrationFileToBigQuery(csvFile, dataset, migrationTable);
    }
    
 }
