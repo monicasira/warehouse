@@ -175,7 +175,7 @@ async function updateCSV(){
      let csvFile = reportNames[i];
      let tempTableName = 'temp_table';
      // deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-     let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile)
+     let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
      let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
    }
    
@@ -271,7 +271,7 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
   
 }
 
-  async function deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName) {
+  async function deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName, bucketName) {
     const {BigQuery} = require('@google-cloud/bigquery');
     const {Storage} = require('@google-cloud/storage');
     const bigquery = new BigQuery();
