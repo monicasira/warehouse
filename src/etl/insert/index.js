@@ -170,7 +170,7 @@ async function updateCSV(){
 //   }
 
 // testing will use only 2 at a time
-   for (let i = 0; i < 1; i++) {
+   for (let i = 0; i < 3; i++) {
      console.log('counter', i)
      let csvFile = reportNames[i];
      let tempTableName = 'temp_table';
@@ -203,7 +203,7 @@ async function migrationFileToBigQuery(reportName, datasetId, tableId){
       .dataset(datasetId)
       .table(tableId)
       .insert(rows);
-    console.log(`Inserted ${rows.length} rows`);
+    console.log(`Inserted ${rows.length} row for migration file.`);
   }
   // [END bigquery_table_insert_rows]
   await insertRowsAsStream();
