@@ -133,7 +133,7 @@ async function insertCSV(){
 //   }
 
 // testing will use only 2 at a time
-   for (let i = 0; i < 6; i++) {
+   for (let i = 0; i < 2; i++) {
      console.log('counter', i)
      let m = await sendToBigQuery(reportNames[i], dataset, table, bucket)
      let n = await migrationFileToBigQuery(reportNames[i], dataset, migrationTable)
@@ -271,6 +271,11 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
 }
 
   async function deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName) {
+    const {BigQuery} = require('@google-cloud/bigquery');
+    const {Storage} = require('@google-cloud/storage');
+    const bigquery = new BigQuery();
+    const storageClient = new Storage();
+
     //** create new table
     const [tableNew] = await bigquery
       .dataset(datasetId)
