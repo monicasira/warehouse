@@ -21,7 +21,8 @@ exports.helloPubSub = (event, context) => {
 exports.ecommInsertTest = (req, res) => {
   let message = req.query.message || req.body.message || 'Hello World!';
   res.status(200).send(message);
-  insertAndUpdateCsv();
+  //insertAndUpdateCsv();
+  updateCSV();
 };
 
 
@@ -297,7 +298,7 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
 
     // Set load job options
     const options = {
-      schema: transcationsTable.metadata.schema,
+      schema: transactionsTable.metadata.schema,
       schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
       skipLeadingRows: 1,
       writeDisposition: 'WRITE_APPEND',
