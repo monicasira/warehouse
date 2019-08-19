@@ -6,19 +6,16 @@ const {BigQuery} = require('@google-cloud/bigquery');
  * @param {!Object} event Event payload.
  * @param {!Object} context Metadata for the event.
  */
- /* 
+ /*
 // Pubsub trigger in PRODUCTION
-exports.helloPubSub = (event, context) => {
+exports.ecommInsertandUpdate = (event, context) => {
   const pubsubMessage = event.data;
   console.log(Buffer.from(pubsubMessage, 'base64').toString());
-  //five();
-  six();
-  //loadCSVFromGCS();
+  insertAndUpdateCsv();
 };
 */
-
 //testing purposes we will be using HTTP trigger
-exports.ecommInsertTest = (req, res) => {
+exports.ecommInsertAndUpdate = (req, res) => {
   let message = req.query.message || req.body.message || 'Hello World!';
   res.status(200).send(message);
   insertAndUpdateCsv();
@@ -84,10 +81,10 @@ async function getFileDiff(datasetId, tableId, bucketName){
 }
 
 async function insertCSV(){
-  const dataset = 'ecomm_test'
+  const dataset = 'ecomm_production'
   const table = 'transactions'
   const migrationTable = 'migration_files'
-  const bucket = 'srichand-ecomm-staging'
+  const bucket = 'srichand-ecomm-production'
 
   let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
@@ -98,15 +95,8 @@ async function insertCSV(){
     console.log('no reports to save');
     return;
   }
-   //For production will use all diffs
-//   for (let i = 0; i < fileList.length; i++) {
-//     console.log('counter', i)
-//     let m = await sendToBigQuery(fileList[i])
-//     let n = migrationFileToBigQuery(fileList[i])
-//   }
 
-// testing will use only 2 at a time
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < fileList.length; i++) {
     console.log('counter', i)
     await sendToBigQuery(fileList[i], dataset, table, bucket);
     await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
@@ -121,10 +111,10 @@ async function updateCSV(){
   const storageClient = new Storage();
 
   const projectName = 'data-warehouse-srichand'
-  const dataset = 'ecomm_test'
+  const dataset = 'ecomm_production'
   const transactionsTableName = 'transactions'
-  const migrationTable = 'update_migration_files'
-  const bucket = 'srichand-ecomm-test'
+  const migrationTable = 'migration_files_for_update'
+  const bucket = 'srichand-ecomm-production-update'
   let fileList = await getFileDiff(dataset, migrationTable, bucket)
   
   console.log('length', fileList.length)
@@ -134,19 +124,12 @@ async function updateCSV(){
     console.log('no reports to save');
     return;
   }
-   //For production will use all diffs
-//   for (let i = 0; i < fileList.length; i++) {
-//     console.log('counter', i)
-//     let m = await sendToBigQuery(fileList[i])
-//     let n = migrationFileToBigQuery(fileList[i])
-//   }
 
-// testing will use only 2 at a time
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < fileList.length; i++) {
     console.log('counter', i)
     let csvFile = fileList[i];
     let tempTableName = 'temp_table';
-    // deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
+    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
     await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
     await migrationFileToBigQuery(csvFile, dataset, migrationTable);
   }
@@ -208,7 +191,7 @@ async function sendToBigQuery(reportName, datasetId, tableId, bucketName){
   const metadata = {
     sourceFormat: 'CSV',
     skipLeadingRows: 1,
-    location: 'asia-east2',
+    location: 'US',
     schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
     writeDisposition: 'WRITE_APPEND',
     destinationTable: destinationTableRef
