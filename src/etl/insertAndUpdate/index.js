@@ -277,7 +277,7 @@ async function deleteAndAppend(project, datasetId, tempTableId, transactionsTabl
   const optionsDelete = {
     query: queryDelete,
     // Location must match that of the dataset(s) referenced in the query.
-    location: 'asia-east2',
+    location: 'US',
   };
 
   // Run the query as a job
