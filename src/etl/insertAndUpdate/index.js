@@ -68,16 +68,20 @@ async function compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketNam
 }
 
 async function getFileDiff(datasetId, tableId, bucketName){
-  return await compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, function(rows, files){  
-    const newFiles = []
-    files.forEach(file => {
-     newFiles.push(file.name);
-    });
-    
-    let diff = newFiles.filter(file => !rows.includes(file))
-    console.log('diff', diff)
-    return diff
-  })
+  try {
+    return await compareBigQueryAndCloudStorageFiles(datasetId, tableId, bucketName, function(rows, files){  
+      const newFiles = []
+      files.forEach(file => {
+       newFiles.push(file.name);
+      });
+      
+      let diff = newFiles.filter(file => !rows.includes(file))
+      console.log('diff', diff)
+      return diff
+    })
+  }catch(error){
+    console.log('error in file diff', error);
+  }
 }
 
 async function insertCSV(){
