@@ -312,7 +312,8 @@ async function deleteAndAppend(project, datasetId, tempTableId, transactionsTabl
     destinationTable: destinationTableRefTransactions,
   };
       
-  const [jobAppend] = await bigquery.createQueryJob(optionsAppend);
+  //const [jobAppend] = await bigquery.createQueryJob(optionsAppend);
+  const [jobAppend] = await jobAppendFunc(optionsAppend); 
   console.log(`Job ${jobAppend.id} started.`);
 
   // Wait for the query to finish
@@ -327,4 +328,11 @@ async function deleteAndAppend(project, datasetId, tempTableId, transactionsTabl
 
   console.log(`Table ${tempTableId} deleted.`);
 
+}
+
+async function jobAppendFunc(options){
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
+
+  return await bigquery.createQueryJob(options)
 }
