@@ -103,14 +103,10 @@ async function insertCSV(){
   for (let i = 0; i < fileList.length; i++) {
     console.log('counter', i)
     try {
-      return await sendToBigQuery(fileList[i], dataset, table, bucket);
+      await sendToBigQuery(fileList[i], dataset, table, bucket);
+      await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
     }catch(error){
       console.log('error inserting files', error);
-    }
-    try {
-      return await migrationFileToBigQuery(fileList[i], dataset, migrationTable);
-    }catch(error){
-      console.log('error inserting migration files', error);
     }
   }
    
@@ -143,14 +139,10 @@ async function updateCSV(){
     let tempTableName = 'temp_table';
     try {
       // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-      return await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
+      await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
+      await migrationFileToBigQuery(csvFile, dataset, migrationTable);
     }catch(error){
       console.log('error when updating files', error);
-    }
-    try {
-      return await migrationFileToBigQuery(csvFile, dataset, migrationTable);
-    }catch(error){
-      console.log('error when inserting migration for update files', error);
     }
   }
 }
