@@ -137,13 +137,9 @@ async function updateCSV(){
     console.log('counter', i)
     let csvFile = fileList[i];
     let tempTableName = 'temp_table';
-    try {
-      // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-      await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket);
-      await migrationFileToBigQuery(csvFile, dataset, migrationTable);
-    }catch(error){
-      console.log('error when updating files', error);
-    }
+    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
+    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
+    .then(await migrationFileToBigQuery(csvFile, dataset, migrationTable))
   }
 }
 
