@@ -313,11 +313,11 @@ async function deleteAndAppend(project, datasetId, tempTableId, transactionsTabl
   console.log(`Job ${jobAppend.id} started.`);
 
   // Wait for the query to finish
-  const [rows3] = await jobAppend.getQueryResults();
-  console.log(`Job ${jobAppend.id} adding rows to original completed.`);
+  //const [rows3] = await jobAppend.getQueryResults();
+  //console.log(`Job ${jobAppend.id} adding rows to original completed.`);
       
   //** Delete table
-  await bigquery
+  return await bigquery
     .dataset(datasetId)
     .table(tempTableId)
     .delete();
