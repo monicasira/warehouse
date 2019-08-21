@@ -124,6 +124,7 @@ async function updateCSV(){
   const migrationTable = 'migration_files_for_update'
   const bucket = 'srichand-ecomm-production-update'
   let fileList = await getFileDiff(dataset, migrationTable, bucket)
+  let tempTableName = 'temp_table';
   
   console.log('length', fileList.length)
   console.log('each fileList', fileList)
@@ -133,15 +134,31 @@ async function updateCSV(){
     return;
   }
 
-  for (let i = 0; i < fileList.length; i++) {
-    console.log('counter', i)
-    let csvFile = fileList[i];
-    let tempTableName = 'temp_table';
-    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
-    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
+//  for (let i = 0; i < fileList.length; i++) {
+//    console.log('counter', i)
+//    let csvFile = fileList[i];
+//    let tempTableName = 'temp_table';
+//    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
+//    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
+//    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
+//  }
+  function asyncIterator() {
+    return {
+      next: function() {
+        if (fileList.length) {
+          let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, fileList.shift(), bucket)
+          let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
+          return [m,n]
+        } else {
+          return
+        }
+      }
+    };
   }
+
+  asyncIterator();
 }
+
 
 async function insertAndUpdateCsv(){
   await insertCSV();
