@@ -142,9 +142,9 @@ async function updateCSV(){
 //    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
 //    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
 //  }
-  async function asyncIterator() {
+  function asyncIterator() {
     return {
-      next: function() {
+      next: async function() {
         if (fileList.length) {
           let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, fileList.shift(), bucket)
           let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
@@ -154,7 +154,7 @@ async function updateCSV(){
     };
   }
 
-  return await asyncIterator();
+  asyncIterator();
 }
 
 
