@@ -143,7 +143,6 @@ async function updateCSV(){
     await migrationFileToBigQuery(csvFile, dataset, migrationTable)
   }
 
-  return "done";
 }
 
 
