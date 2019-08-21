@@ -134,27 +134,16 @@ async function updateCSV(){
     return;
   }
 
-//  for (let i = 0; i < fileList.length; i++) {
-//    console.log('counter', i)
-//    let csvFile = fileList[i];
-//    let tempTableName = 'temp_table';
-//    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-//    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
-//    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
-//  }
-  function asyncIterator() {
-    return {
-      next: async function() {
-        if (fileList.length) {
-          let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, fileList.shift(), bucket)
-          let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
-          return [m,n]
-        } 
-      }
-    };
+  for (let i = 0; i < fileList.length; i++) {
+    console.log('counter', i)
+    let csvFile = fileList[i];
+    let tempTableName = 'temp_table';
+    // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
+    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
+    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
   }
 
-  asyncIterator();
+  return "done";
 }
 
 
