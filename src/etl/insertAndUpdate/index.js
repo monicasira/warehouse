@@ -138,10 +138,8 @@ async function updateCSV(){
     let csvFile = fileList[i];
     let tempTableName = 'temp_table';
     // parameters: deleteAndAppend(project, datasetId, tempTableId, transactionsTableId, fileName)
-    let m = await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
-    let n = await migrationFileToBigQuery(csvFile, dataset, migrationTable)
-
-    return [m,n]
+    await deleteAndAppend(projectName, dataset, tempTableName, transactionsTableName, csvFile, bucket)
+    await migrationFileToBigQuery(csvFile, dataset, migrationTable)
   }
 }
 
