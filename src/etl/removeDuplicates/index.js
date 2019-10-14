@@ -18,7 +18,7 @@ function main() {
   // Instantiate client
   const bigquery = new BigQuery();
   const datasetId = 'ecomm_production';
-  const tableId = 'transactions';
+  const tableId = 'transactions_backup';
   async function removeDuplicates() {
 
     // Retrieve destination table reference
@@ -75,5 +75,5 @@ function main() {
     console.log(`Job ${job2.id} complete delete column row_number(rn).`);
   }
   // [END bigquery_add_column_load_append]
-  removeDuplicates();
+  return await removeDuplicates();
 }
