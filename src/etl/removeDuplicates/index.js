@@ -35,10 +35,10 @@ function main() {
                           *,
                           ROW_NUMBER()
                               OVER (PARTITION BY line_item_id)
-                              row_number
+                              as rn
                       FROM \`data-warehouse-srichand.${datasetId}.${tableId}\`
-                    )
-                    WHERE row_number = 1`;
+                    ) as no_dup
+                    WHERE no_dup.rn = 1`;
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options = {
@@ -58,7 +58,7 @@ function main() {
     console.log(`Job ${job.id} deleted duplicates with row 1.`);
 
     // remove row number columm
-    const query2 = `SELECT no_dup.* except (row_number) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\` as no_dup`;
+    const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
 
     const options2 = {
       query: query2,
