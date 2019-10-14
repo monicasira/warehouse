@@ -57,13 +57,19 @@ function main() {
     const [rows] = await job.getQueryResults();
     console.log(`Job ${job.id} deleted duplicates with row 1.`);
 
+    const [table1] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .get();
+    const destinationTableRef1 = table1.metadata.tableReference;
+
     const query2 = `SELECT * except(row_number) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
 
     const options2 = {
       query: query2,
       location: 'asia-east2',
       writeDisposition: 'WRITE_TRUNCATE',
-      destinationTable: destinationTableRef,
+      destinationTable: destinationTableRef1,
     };
 
     // Run the query as a job
