@@ -68,7 +68,7 @@ function main() {
     };
 
     // Run the query as a job
-    const [job2] = await bigquery.createQueryJob(options);
+    const [job2] = await bigquery.createQueryJob(options2);
     console.log(`Job remove row number ${job2.id} started.`);
 
   }
