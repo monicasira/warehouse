@@ -4,11 +4,11 @@
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.ecommRemoveDuplicates = (req, res) => {
-  let message = req.query.message || req.body.message || 'Hello World!';
+
+exports.ecommRemoveDuplicates = (event, context) => {
+  const pubsubMessage = event.data;
+  console.log(Buffer.from(pubsubMessage, 'base64').toString());
   main();
-  res.status(200).send(message);
-  
 };
 
 function main() {
