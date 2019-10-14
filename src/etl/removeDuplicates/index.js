@@ -51,7 +51,7 @@ function main() {
 
     // Run the query as a job
     const [job] = await bigquery.createQueryJob(options);
-    console.log(`Job ${job2.id} started.`);
+    console.log(`Job ${job.id} started.`);
 
     // Wait for the query to finish
     const [rows] = await job.getQueryResults();
