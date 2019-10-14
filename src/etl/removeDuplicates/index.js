@@ -73,6 +73,8 @@ async function main() {
 
     const [rows2] = await job2.getQueryResults();
     console.log(`Job ${job2.id} complete delete column row_number(rn).`);
+
+    return
   }
   // [END bigquery_add_column_load_append]
   return await removeDuplicates();
