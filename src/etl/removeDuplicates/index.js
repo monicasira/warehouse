@@ -44,7 +44,7 @@ function main() {
     const options = {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
-      location: 'asia-east2',
+      location: 'US',
       writeDisposition: 'WRITE_TRUNCATE',
       destinationTable: destinationTableRef,
     };
@@ -62,7 +62,7 @@ function main() {
 
     const options2 = {
       query: query2,
-      location: 'asia-east2',
+      location: 'US',
       writeDisposition: 'WRITE_TRUNCATE',
       destinationTable: destinationTableRef,
     };
