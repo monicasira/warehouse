@@ -11,7 +11,7 @@ exports.ecommRemoveDuplicate = (event, context) => {
   main();
 };
 
-function main() {
+async function main() {
   // [START bigquery_add_column_load_append]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
