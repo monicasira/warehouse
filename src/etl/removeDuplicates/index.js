@@ -57,7 +57,7 @@ function main() {
     const [rows] = await job.getQueryResults();
     console.log(`Job ${job.id} deleted duplicates with row 1.`);
 
-    const query2 = `SELECT * except (row_number) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
+    const query2 = `SELECT * except(row_number) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
 
     const options2 = {
       query: query2,
