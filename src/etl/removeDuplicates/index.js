@@ -54,11 +54,9 @@ async function main() {
       // Run the query as a job
       try {
         const [job] = await bigquery.createQueryJob(options);
+        console.log('response from job', job[0])
         console.log(`Job ${job.id} start remove duplicate.`);
-        setTimeout(function(){
-          re = await job.getQueryResults();
-          console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
-        }, 10000)
+        re = await job.getQueryResults();
       } catch(e) {
         console.log(e)
       }
