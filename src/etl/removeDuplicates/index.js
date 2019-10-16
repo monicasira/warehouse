@@ -54,14 +54,12 @@ async function main() {
       const [job] = await bigquery.createQueryJob(options);
       console.log(`Job ${job.id} start remove duplicate.`);
 
-      // Wait for the query to finish
-      const [rows] = await job.getQueryResults();
-      console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
-
-      return rows
+      return job
     }
 
-    rows = await removeDuplicateFromTable();
+    job = await removeDuplicateFromTable();
+//    const [rows] = await job.getQueryResults();
+//    console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
 
     // remove row number columm
     const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
@@ -77,10 +75,10 @@ async function main() {
     const [job2] = await bigquery.createQueryJob(options2);
     console.log(`Job ${job2.id} start to delete column row_number(rn)`);
 
-    const [rows2] = await job2.getQueryResults();
-    console.log(`Job ${job2.id} complete delete column row_number(rn).`);
+//    const [rows2] = await job2.getQueryResults();
+//    console.log(`Job ${job2.id} complete delete column row_number(rn).`);
 
-    return rows2
+    return job2
   }
   // [END bigquery_add_column_load_append]
   return await removeDuplicates();
