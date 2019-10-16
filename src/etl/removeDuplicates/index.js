@@ -54,36 +54,39 @@ async function main() {
       const [job] = await bigquery.createQueryJob(options);
       console.log(`Job ${job.id} start remove duplicate.`);
 
-      return job
-    }
-
-    async function waitDuplicate(){
-      job = await removeDuplicateFromTable();
-
       const [rows] = await job.getQueryResults();
       console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
 
       return rows
     }
+    
 
-    await waitDuplicate();
+    async function removeRowNumber(){
+      // remove row number columm
+      const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
 
-    // remove row number columm
-    const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
+      const options2 = {
+        query: query2,
+        location: 'US',
+        writeDisposition: 'WRITE_TRUNCATE',
+        destinationTable: destinationTableRef,
+      };
 
-    const options2 = {
-      query: query2,
-      location: 'US',
-      writeDisposition: 'WRITE_TRUNCATE',
-      destinationTable: destinationTableRef,
-    };
+      // Run the query as a job
+      const [job2] = await bigquery.createQueryJob(options2);
+      console.log(`Job ${job2.id} start to delete column row_number(rn)`);
 
-    // Run the query as a job
-    const [job2] = await bigquery.createQueryJob(options2);
-    console.log(`Job ${job2.id} start to delete column row_number(rn)`);
+      return job2
+    }
 
-    return job2
+    let promisesArr = []
+    let promise1 = await removeDuplicateFromTable();
+    let promise2 = await removeRowNumber();
+    promisesArr.push(promise1)
+    promisesArr.push(promise2)
+    results = await Promise.all(promisesArr)
+    return results
   }
   // [END bigquery_add_column_load_append]
-  return await removeDuplicates();
+  removeDuplicates();
 }
