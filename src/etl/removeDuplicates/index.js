@@ -49,15 +49,21 @@ async function main() {
         writeDisposition: 'WRITE_TRUNCATE',
         destinationTable: destinationTableRef,
       };
-
+      
+      let re
       // Run the query as a job
-      const [job] = await bigquery.createQueryJob(options);
-      console.log(`Job ${job.id} start remove duplicate.`);
+      try {
+        const [job] = await bigquery.createQueryJob(options);
+        console.log(`Job ${job.id} start remove duplicate.`);
+        setTimeout(function(){
+          re = await job.getQueryResults();
+          console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
+        }, 10000)
+      } catch(e) {
+        console.log(e)
+      }
 
-      const [rows] = await job.getQueryResults();
-      console.log(`Job ${job.id} complete delete duplicate from transactions table.`);
-
-      return rows
+      return re 
     }
     
 
