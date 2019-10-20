@@ -8,7 +8,7 @@
 exports.ecommRemoveDuplicate = (event, context) => {
   const pubsubMessage = event.data;
   console.log(Buffer.from(pubsubMessage, 'base64').toString());
-  main();
+  return main();
 };
 
 async function main() {
@@ -54,7 +54,7 @@ async function main() {
       // Run the query as a job
       try {
         const [job] = await bigquery.createQueryJob(options);
-        console.log('response from job', job[0])
+        console.log(`response from job, ${job[0]}`)
         console.log(`Job ${job.id} start remove duplicate.`);
         re = await job.getQueryResults();
       } catch(e) {
