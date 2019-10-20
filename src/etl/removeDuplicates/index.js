@@ -17,20 +17,20 @@ async function main() {
   const {BigQuery} = require('@google-cloud/bigquery');
   // Instantiate client
   const bigquery = new BigQuery();
-  const dataset = 'ecomm_production';
+  const datasetBq = 'ecomm_production';
   const tableBq = 'transactions_backup';
     
   // Retrieve destination table reference
   const [table] = await bigquery
-    .dataset(datasetId)
+    .dataset(datasetBq)
     .table(tableBq)
     .get();
 
   const destination = table.metadata.tableReference;
 
 
-  await removeDuplicateFromTable(dataset, tableBq, destination);
-  await removeRowNumber(dataset, tableBq, destination);
+  await removeDuplicateFromTable(datasetBq, tableBq, destination);
+  await removeRowNumber(datasetBq, tableBq, destination);
 }
 
 
