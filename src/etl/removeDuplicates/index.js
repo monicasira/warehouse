@@ -84,13 +84,8 @@ async function main() {
       return job2
     }
 
-    let promisesArr = []
-    let promise1 = await removeDuplicateFromTable();
-    let promise2 = await removeRowNumber();
-    promisesArr.push(promise1)
-    promisesArr.push(promise2)
-    results = await Promise.all(promisesArr)
-    return results
+    await removeDuplicateFromTable();
+    return await removeRowNumber();
   }
   // [END bigquery_add_column_load_append]
   await removeDuplicates();
