@@ -16,12 +16,12 @@ async function main() {
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   // Instantiate client
-  const bigquery = new BigQuery();
+  const bigqueryN = new BigQuery();
   const datasetBq = 'ecomm_production';
   const tableBq = 'transactions_backup';
     
   // Retrieve destination table reference
-  const [table] = await bigquery
+  const [table] = await bigqueryN
     .dataset(datasetBq)
     .table(tableBq)
     .get();
@@ -29,12 +29,12 @@ async function main() {
   const destination = table.metadata.tableReference;
 
 
-  await removeDuplicateFromTable(datasetBq, tableBq, destination);
-  await removeRowNumber(datasetBq, tableBq, destination);
+  await removeDuplicateFromTable(bigqueryN, datasetBq, tableBq, destination);
+  await removeRowNumber(bigqueryN, datasetBq, tableBq, destination);
 }
 
 
-async function removeDuplicateFromTable(datasetId, tableId, destinationTableRef){
+async function removeDuplicateFromTable(bigquery, datasetId, tableId, destinationTableRef){
   //** Delete matching line_items from original table
   const query = `SELECT *
                   FROM (
@@ -69,7 +69,7 @@ async function removeDuplicateFromTable(datasetId, tableId, destinationTableRef)
   return re 
 }
 
-async function removeRowNumber(datasetId, tableId, destinationTableRef){
+async function removeRowNumber(bigquery, datasetId, tableId, destinationTableRef){
   // remove row number columm
   const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
 
