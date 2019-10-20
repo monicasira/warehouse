@@ -92,5 +92,5 @@ async function main() {
     return results
   }
   // [END bigquery_add_column_load_append]
-  removeDuplicates();
+  return await removeDuplicates();
 }
