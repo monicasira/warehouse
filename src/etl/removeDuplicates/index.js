@@ -17,76 +17,73 @@ async function main() {
   const {BigQuery} = require('@google-cloud/bigquery');
   // Instantiate client
   const bigquery = new BigQuery();
-  const datasetId = 'ecomm_production';
-  const tableId = 'transactions_backup';
-
-  async function removeDuplicates() {
-
-    // Retrieve destination table reference
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .get();
-    const destinationTableRef = table.metadata.tableReference;
-   
-    async function removeDuplicateFromTable(){
-      //** Delete matching line_items from original table
-      const query = `SELECT *
-                      FROM (
-                        SELECT
-                            *,
-                            ROW_NUMBER()
-                                OVER (PARTITION BY line_item_id)
-                                as rn
-                        FROM \`data-warehouse-srichand.${datasetId}.${tableId}\`
-                      ) as no_dup
-                      WHERE no_dup.rn = 1`;
-
-      // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
-      const options = {
-        query: query,
-        // Location must match that of the dataset(s) referenced in the query.
-        location: 'US',
-        writeDisposition: 'WRITE_TRUNCATE',
-        destinationTable: destinationTableRef,
-      };
-      
-      let re
-      // Run the query as a job
-      try {
-        const [job] = await bigquery.createQueryJob(options);
-        console.log(`response from job, ${job[0]}`)
-        console.log(`Job ${job.id} start remove duplicate.`);
-        re = await job.getQueryResults();
-      } catch(e) {
-        console.log(e)
-      }
-
-      return re 
-    }
+  const dataset = 'ecomm_production';
+  const table = 'transactions_backup';
     
+  // Retrieve destination table reference
+  const [table] = await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .get();
 
-    async function removeRowNumber(){
-      // remove row number columm
-      const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
+  const destination = table.metadata.tableReference;
 
-      const options2 = {
-        query: query2,
-        location: 'US',
-        writeDisposition: 'WRITE_TRUNCATE',
-        destinationTable: destinationTableRef,
-      };
 
-      // Run the query as a job
-      const [job2] = await bigquery.createQueryJob(options2);
-      console.log(`Job ${job2.id} start to delete column row_number(rn)`);
+  await removeDuplicateFromTable(dataset, table, destination);
+  await removeRowNumber(dataset, table, destination);
+}
 
-      return job2
-    }
 
-    await removeDuplicateFromTable();
-    return await removeRowNumber();
+async function removeDuplicateFromTable(datasetId, tableId, destinationTableRef){
+  //** Delete matching line_items from original table
+  const query = `SELECT *
+                  FROM (
+                    SELECT
+                        *,
+                        ROW_NUMBER()
+                            OVER (PARTITION BY line_item_id)
+                            as rn
+                    FROM \`data-warehouse-srichand.${datasetId}.${tableId}\`
+                  ) as no_dup
+                  WHERE no_dup.rn = 1`;
+
+  // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
+  const options = {
+    query: query,
+    // Location must match that of the dataset(s) referenced in the query.
+    location: 'US',
+    writeDisposition: 'WRITE_TRUNCATE',
+    destinationTable: destinationTableRef,
+  };
+  
+  let re
+  // Run the query as a job
+  try {
+    const [job] = await bigquery.createQueryJob(options);
+    console.log(`response from job, ${job[0]}`)
+    console.log(`Job ${job.id} start remove duplicate.`);
+    re = await job.getQueryResults();
+  } catch(e) {
+    console.log(e)
   }
-  // [END bigquery_add_column_load_append]
-  return removeDuplicates();
+
+  return re 
+}
+
+async function removeRowNumber(datasetId, tableId, destinationTableRef){
+  // remove row number columm
+  const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
+
+  const options2 = {
+    query: query2,
+    location: 'US',
+    writeDisposition: 'WRITE_TRUNCATE',
+    destinationTable: destinationTableRef,
+  };
+
+  // Run the query as a job
+  const [job2] = await bigquery.createQueryJob(options2);
+  console.log(`Job ${job2.id} start to delete column row_number(rn)`);
+
+  return job2
 }
