@@ -18,19 +18,19 @@ async function main() {
   // Instantiate client
   const bigquery = new BigQuery();
   const dataset = 'ecomm_production';
-  const table = 'transactions_backup';
+  const tableBq = 'transactions_backup';
     
   // Retrieve destination table reference
   const [table] = await bigquery
     .dataset(datasetId)
-    .table(tableId)
+    .table(tableBq)
     .get();
 
   const destination = table.metadata.tableReference;
 
 
-  await removeDuplicateFromTable(dataset, table, destination);
-  await removeRowNumber(dataset, table, destination);
+  await removeDuplicateFromTable(dataset, tableBq, destination);
+  await removeRowNumber(dataset, tableBq, destination);
 }
 
 
@@ -60,7 +60,6 @@ async function removeDuplicateFromTable(datasetId, tableId, destinationTableRef)
   // Run the query as a job
   try {
     const [job] = await bigquery.createQueryJob(options);
-    console.log(`response from job, ${job[0]}`)
     console.log(`Job ${job.id} start remove duplicate.`);
     re = await job.getQueryResults();
   } catch(e) {
