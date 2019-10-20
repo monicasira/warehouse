@@ -19,6 +19,7 @@ async function main() {
   const bigquery = new BigQuery();
   const datasetId = 'ecomm_production';
   const tableId = 'transactions_backup';
+
   async function removeDuplicates() {
 
     // Retrieve destination table reference
@@ -92,5 +93,5 @@ async function main() {
     return results
   }
   // [END bigquery_add_column_load_append]
-  return await removeDuplicates();
+  await removeDuplicates();
 }
