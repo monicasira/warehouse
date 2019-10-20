@@ -88,5 +88,5 @@ async function main() {
     return await removeRowNumber();
   }
   // [END bigquery_add_column_load_append]
-  await removeDuplicates();
+  return removeDuplicates();
 }
