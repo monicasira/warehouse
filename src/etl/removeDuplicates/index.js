@@ -18,7 +18,7 @@ async function main() {
   // Instantiate client
   const bigqueryN = new BigQuery();
   const datasetBq = 'ecomm_production';
-  const tableBq = 'transactions_backup';
+  const tableBq = 'transactions';
     
   // Retrieve destination table reference
   const [table] = await bigqueryN
