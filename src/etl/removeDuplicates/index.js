@@ -5,10 +5,10 @@
  * @param {!express:Response} res HTTP response context.
  */
 
-exports.ecommRemoveDuplicate = (event, context) => {
+exports.ecommRemoveDuplicate = async function(event, context) => {
   const pubsubMessage = event.data;
   console.log(Buffer.from(pubsubMessage, 'base64').toString());
-  return main();
+  return await main();
 };
 
 async function main() {
