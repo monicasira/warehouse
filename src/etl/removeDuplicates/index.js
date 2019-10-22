@@ -5,10 +5,10 @@
  * @param {!express:Response} res HTTP response context.
  */
 
-exports.ecommRemoveDuplicate = async (event, context) => {
+exports.ecommRemoveDuplicate = (event, context) => {
   const pubsubMessage = event.data;
   console.log(Buffer.from(pubsubMessage, 'base64').toString());
-  return await main();
+  return main();
 };
 
 async function main() {
@@ -29,8 +29,7 @@ async function main() {
   const destination = table.metadata.tableReference;
 
 
-  await removeDuplicateFromTable(bigqueryN, datasetBq, tableBq, destination);
-  await removeRowNumber(bigqueryN, datasetBq, tableBq, destination);
+  return await removeDuplicateFromTable(bigqueryN, datasetBq, tableBq, destination);
 }
 
 
@@ -60,9 +59,22 @@ async function removeDuplicateFromTable(bigquery, datasetId, tableId, destinatio
   const [job] = await bigquery.createQueryJob(options);
   console.log(`Job ${job.id} start remove duplicate.`);
 
-  const re = await job.getQueryResults();
+  await job.getQueryResults();
 
-  return re 
+  const query2 = `SELECT * except (rn) FROM \`data-warehouse-srichand.${datasetId}.${tableId}\``;
+
+  const options2 = {
+    query: query2,
+    location: 'US',
+    writeDisposition: 'WRITE_TRUNCATE',
+    destinationTable: destinationTableRef,
+  };
+
+  // Run the query as a job
+  const [job2] = await bigquery.createQueryJob(options2);
+  console.log(`Job ${job2.id} start to delete column row_number(rn)`);
+
+  return job2
 }
 
 async function removeRowNumber(bigquery, datasetId, tableId, destinationTableRef){
