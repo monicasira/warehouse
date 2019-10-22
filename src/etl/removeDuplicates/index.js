@@ -29,7 +29,7 @@ async function main() {
   const destination = table.metadata.tableReference;
 
 
-  return await removeDuplicateFromTable(bigqueryN, datasetBq, tableBq, destination);
+  await removeDuplicateFromTable(bigqueryN, datasetBq, tableBq, destination);
 }
 
 
