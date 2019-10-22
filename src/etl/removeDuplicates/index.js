@@ -56,15 +56,11 @@ async function removeDuplicateFromTable(bigquery, datasetId, tableId, destinatio
     destinationTable: destinationTableRef,
   };
   
-  let re
   // Run the query as a job
-  try {
-    const [job] = await bigquery.createQueryJob(options);
-    console.log(`Job ${job.id} start remove duplicate.`);
-    re = await job.getQueryResults();
-  } catch(e) {
-    console.log(e)
-  }
+  const [job] = await bigquery.createQueryJob(options);
+  console.log(`Job ${job.id} start remove duplicate.`);
+
+  const re = await job.getQueryResults();
 
   return re 
 }
